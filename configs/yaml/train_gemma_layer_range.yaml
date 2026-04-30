@@ -1,0 +1,47 @@
+# Layer-range L2-SP regularization training configuration (Gemma-3-4B)
+# Uses different regularization strengths for first/middle/last layers
+# Gemma-3-4B has 34 layers: first 9 + last 6 protected, middle 19 relaxed
+# Vision components are auto-stripped by load_model() in utils.py
+# Usage: python train.py --config_path configs/yaml/train_gemma_layer_range.yaml
+
+model:
+  model_name: "google/gemma-3-4b-pt"
+  use_gradient_checkpointing: true
+
+data:
+  families:
+    - "slavic"  # Change to target family
+  data_fraction: 1.0
+  data_prefix: "./data/tokenized"
+  max_length: 2048
+
+training:
+  train_bsz: 4
+  valid_bsz: 4
+  grad_accum: 12
+  max_steps: 16954
+  warmup_steps: 200
+  lr: 2.0e-5
+
+regularizer:
+  regularization_type: "layer_range_l2sp"
+  lambda_first_layers: 0.001
+  lambda_middle_layers: 0.05
+  lambda_last_layers: 0.001
+  first_layers: 9   # Layers 0-8 strongly protected
+  last_layers: 6    # Layers 28-33 strongly protected
+  attention_only: false
+
+checkpoint:
+  serialization_dir: "./checkpoints/gemma_4b_slavic_layer_reg"
+  resume_from_checkpoint: false
+  checkpoint_path: null   # Set to a checkpoint path to resume
+  eval_steps: 500
+  save_steps: 1000
+  save_total_limit: 5
+  run_name: "slavic-layer-range-l2sp-gemma4b"
+  wandb_project: "gemma-runs"
+  wandb_entity: "expert-multilingual-pretraining"
+  early_stopping_patience: 6
+  early_stopping_threshold: 0.005
+  early_stopping_metric: "eval_loss"

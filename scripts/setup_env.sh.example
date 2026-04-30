@@ -1,0 +1,42 @@
+#!/bin/bash
+# =============================================================================
+# x-elm-v2 environment template
+#
+# Copy this file to `.env` at the repo root (or source it directly) and
+# customize the paths/tokens for your environment.
+#
+#   cp scripts/setup_env.sh.example .env
+#   # edit .env
+#
+# The slurm scripts source `slurm/common.sh`, which auto-loads `.env` if it
+# exists at $PROJECT_ROOT.
+# =============================================================================
+
+# --- Required --------------------------------------------------------------
+
+# Path to this repository. Defaults to $HOME/x-elm-v2 if unset.
+export PROJECT_ROOT="$HOME/x-elm-v2"
+
+# Root directory for data + checkpoints + HF cache. The individual roots
+# below default to subdirs of DATA_ROOT if not set explicitly.
+export DATA_ROOT="$HOME/x-elm-v2-data"
+
+# HuggingFace access token (required for gated models like google/gemma-3-*).
+export HF_TOKEN="hf_..."
+
+# --- Optional (override individual sub-paths) ------------------------------
+
+# Tokenized dataset root (default: $DATA_ROOT/tokenized)
+# export TOKENIZED_DATA="$DATA_ROOT/tokenized"
+
+# Checkpoint root (default: $DATA_ROOT/checkpoints)
+# export CHECKPOINTS_ROOT="$DATA_ROOT/checkpoints"
+
+# HuggingFace cache (default: $DATA_ROOT/hf_cache)
+# export HF_HOME="$DATA_ROOT/hf_cache"
+
+# --- Optional (Weights & Biases) -------------------------------------------
+
+# export WANDB_API_KEY="..."
+# export WANDB_ENTITY="your-entity"
+# export WANDB_PROJECT="x-elm-v2"

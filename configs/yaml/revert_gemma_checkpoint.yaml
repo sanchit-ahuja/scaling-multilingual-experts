@@ -1,0 +1,46 @@
+# Weight Reversion configuration (Gemma-3-4B)
+# Applies Train-then-Revert strategy to already trained checkpoints
+# This saves compute by reverting middle layers post-hoc instead of retraining
+# Gemma-3-4B has 34 layers: first 9 + last 6 kept, middle 19 reverted
+# Vision components are auto-stripped by load_model() in utils.py
+
+model:
+  # Base model path (original pre-trained model)
+  model_name: "google/gemma-3-4b-pt"
+
+revert:
+  # Enable weight reversion mode
+  revert_checkpoint_only: true
+  
+  # Path to the trained checkpoint to revert.
+  # Set via --revert.checkpoint_path on the CLI, or fill in here.
+  checkpoint_path: null
+
+  # Output path for reverted model.
+  # If null, defaults to <checkpoint_path>/../reverted.
+  revert_output_path: null
+regularizer:
+  # Number of first layers to keep trained (layers 0 to first_layers-1)
+  first_layers: 9
+  
+  # Number of last layers to keep trained (layers num_layers-last_layers to num_layers-1)
+  last_layers: 6
+  
+  # Total number of layers (auto-detected if null)
+  num_layers: null
+  
+  # If true, only revert MLP weights (keep trained attention)
+  # If false, revert both attention and MLP in middle layers
+  attention_only: false
+
+checkpoint:
+  # Used to find latest checkpoint if revert.checkpoint_path is null.
+  serialization_dir: "./checkpoints/austronesian_gemma_4b_expert"
+
+# Example usage:
+# python train.py --config_path configs/yaml/revert_gemma_checkpoint.yaml
+#
+# Or with overrides:
+# python train.py --config_path configs/yaml/revert_gemma_checkpoint.yaml \
+#     --revert.checkpoint_path /path/to/trained/checkpoint \
+#     --revert.revert_output_path /path/to/output/reverted

@@ -1,0 +1,27 @@
+# Dense 25B training configuration (Qwen3-1.7B)
+# Usage: python train.py --config_path configs/yaml/train_qwen_dense.yaml
+
+model:
+  model_name: "Qwen/Qwen3-1.7B-Base"
+
+data:
+  families: null  # Train on all families
+
+training:
+  train_bsz: 16
+  grad_accum: 8
+  max_steps: 50000
+  warmup_steps: 500
+  lr: 5.0e-5
+
+regularizer:
+  regularization_type: "none"
+
+checkpoint:
+  serialization_dir: "./checkpoints/qwen_dense_25b"
+  eval_steps: 1000
+  save_steps: 1000
+  save_total_limit: 5
+  early_stopping_patience: 3  # Stop after 3 evaluations without improvement
+  early_stopping_threshold: 0.001  # Minimum improvement required
+  early_stopping_metric: "eval_loss"

@@ -1,0 +1,43 @@
+# Logs and outputs
+logs/
+*.err
+*.out
+*.log
+*.csv
+*.tar.gz
+
+# Python
+__pycache__/
+*__pycache__/
+*.py[cod]
+*$py.class
+.env
+
+# Tracking / experiment logs
+wandb/
+
+# IDE
+.vscode/
+.idea/
+
+# Virtual environments
+.venv/
+venv/
+
+# Internal tooling artifacts (not part of the public repo)
+.claude/
+CLAUDE.md
+
+# Generated research outputs — regenerable, not source
+divergence_results/
+plots/
+results/
+
+# Local experiment artifacts
+experts_gemma_4b_soup.txt
+data/
+checkpoints/
+
+# macOS / editors
+.DS_Store
+*.swp

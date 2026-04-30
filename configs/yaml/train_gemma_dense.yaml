@@ -1,0 +1,38 @@
+# Dense 25B training configuration (Gemma-3-4B)
+# Vision components are auto-stripped by load_model() in utils.py
+# Usage: python train.py --config_path configs/yaml/train_gemma_dense.yaml
+
+model:
+  model_name: "google/gemma-3-4b-pt"
+  use_gradient_checkpointing: true
+
+data:
+  families: null  # Train on all families
+  data_fraction: 1.0
+  data_prefix: "./data/tokenized"   # Override via --data.data_prefix or symlink ./data to your storage
+  max_length: 2048
+
+training:
+  train_bsz: 4
+  valid_bsz: 4
+  grad_accum: 12
+  max_steps: 50000
+  warmup_steps: 500
+  lr: 5.0e-5
+
+regularizer:
+  regularization_type: "none"
+
+checkpoint:
+  serialization_dir: "./checkpoints/gemma_4b_dense_25b"
+  resume_from_checkpoint: false
+  checkpoint_path: null   # Set to a checkpoint path to resume
+  eval_steps: 1000
+  save_steps: 1000
+  save_total_limit: 5
+  run_name: "dense-25b-gemma4b"
+  wandb_project: "gemma-runs"
+  wandb_entity: "expert-multilingual-pretraining"
+  early_stopping_patience: 3
+  early_stopping_threshold: 0.001
+  early_stopping_metric: "eval_loss"

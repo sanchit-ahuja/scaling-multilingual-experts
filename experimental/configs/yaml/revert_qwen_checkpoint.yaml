@@ -1,0 +1,46 @@
+# Weight Reversion configuration (Qwen3-1.7B)
+# Applies Train-then-Revert strategy to already trained checkpoints
+# This saves compute by reverting middle layers post-hoc instead of retraining
+# Qwen3-1.7B has 28 layers: first 6 + last 4 kept, middle 18 reverted
+
+model:
+  # Base model path (original pre-trained model)
+  model_name: "Qwen/Qwen3-1.7B-Base"
+
+revert:
+  # Enable weight reversion mode
+  revert_checkpoint_only: true
+  
+  # Path to the trained checkpoint to revert.
+  # Set via --revert.checkpoint_path on the CLI, or fill in here.
+  checkpoint_path: null
+
+  # Output path for reverted model.
+  # If null, defaults to <checkpoint_path>/../reverted.
+  revert_output_path: null
+
+regularizer:
+  # Number of first layers to keep trained (layers 0 to first_layers-1)
+  first_layers: 6
+  
+  # Number of last layers to keep trained (layers num_layers-last_layers to num_layers-1)
+  last_layers: 4
+  
+  # Total number of layers (auto-detected if null)
+  num_layers: null
+  
+  # If true, only revert MLP weights (keep trained attention)
+  # If false, revert both attention and MLP in middle layers
+  attention_only: false
+
+checkpoint:
+  # Used to find latest checkpoint if revert.checkpoint_path is null.
+  serialization_dir: "./checkpoints"
+
+# Example usage:
+# python train.py --config_path configs/yaml/revert_qwen_checkpoint.yaml
+#
+# Or with overrides:
+# python train.py --config_path configs/yaml/revert_qwen_checkpoint.yaml \
+#     --revert.checkpoint_path /path/to/trained/checkpoint \
+#     --revert.revert_output_path /path/to/output/reverted

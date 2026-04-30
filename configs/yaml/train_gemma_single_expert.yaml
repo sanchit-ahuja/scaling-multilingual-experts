@@ -1,0 +1,35 @@
+# Single-family expert training configuration (Gemma-3-4B)
+# Use for training language family specialists
+# Vision components are auto-stripped by load_model() in utils.py
+# Usage: python train.py --config_path configs/yaml/train_gemma_single_expert.yaml
+
+model:
+  model_name: "google/gemma-3-4b-pt"  
+  use_gradient_checkpointing: true
+
+data:
+  families:
+    - "Austronesian"  # Change to target family
+  data_fraction: 1.0
+  data_prefix: "./data/tokenized"   # Override via --data.data_prefix or symlink ./data to your storage
+  max_length: 2048
+
+training:
+  train_bsz: 4
+  valid_bsz: 4
+  grad_accum: 12
+  max_steps: 16954  # ~1 epoch, early stopping will terminate if saturated
+  warmup_steps: 200  # ~2% of steps
+  lr: 2.0e-5
+
+checkpoint:
+  serialization_dir: "./checkpoints/austronesian_gemma_4b_expert"
+  eval_steps: 500   # Frequent evals to catch saturation
+  save_steps: 1000  # Save often to capture best checkpoint
+  save_total_limit: 5
+  run_name: "austronesian-expert-gemma4b"
+  wandb_project: "gemma-runs"  # Your W&B project name
+  wandb_entity: "expert-multilingual-pretraining"  # Optional: your W&B team/entity
+  early_stopping_patience: 6      # 6 evals × 500 steps = 3000 steps patience
+  early_stopping_threshold: 0.005 # Stop if <0.5% improvement
+  early_stopping_metric: "eval_loss"
