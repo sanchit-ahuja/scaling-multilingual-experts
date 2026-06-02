@@ -17,4 +17,5 @@
 source "$(dirname "$0")/common.sh"
 hf_login
 
-python "${PROJECT_ROOT}/tokenize_data.py" --sample-percentage 5
+python "${PROJECT_ROOT}/tokenize_data.py" \
+    --output-path "${TOKENIZED_DATA}"

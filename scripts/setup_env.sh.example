@@ -24,6 +24,9 @@ export DATA_ROOT="$HOME/x-elm-v2-data"
 # HuggingFace access token (required for gated models like google/gemma-3-*).
 export HF_TOKEN="hf_..."
 
+# Local MADLAD JSONL source used by tokenize_data.py.
+export MADLAD_LOCAL_JSONL="/path/to/madlad.jsonl"
+
 # --- Optional (override individual sub-paths) ------------------------------
 
 # Tokenized dataset root (default: $DATA_ROOT/tokenized)

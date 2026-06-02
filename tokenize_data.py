@@ -203,7 +203,7 @@ def main():
     args = parser.parse_args()
 
     logger.info("Starting tokenization process...")
-    logger.info(f"Source: {HF_DATASET}")
+    logger.info(f"Source: {LOCAL_DATA_FILE}")
     logger.info(f"Output base: {args.output_path or OUTPUT_BASE_PATH}")
     logger.info(f"Tokenizer: {TOKENIZER_PATH}")
     logger.info(f"Token target per language: {args.token_target:,}")

@@ -14,6 +14,8 @@ All experiments in the paper use [`google/gemma-3-4b-pt`](https://huggingface.co
 
 ```
 x-elm-v2/
+├── AGENTS.md                  # Shared coding-agent project guidance
+├── CLAUDE.md                  # Claude Code adapter that imports AGENTS.md
 ├── train.py                   # Main training + evaluation entry point (pyrallis CLI)
 ├── tokenize_data.py           # Tokenize MADLAD data per family into Arrow datasets
 ├── model_soup.py              # Average weights across expert checkpoints
@@ -31,7 +33,10 @@ x-elm-v2/
 ├── slurm/                     # SLURM job scripts (templated for NCSA Delta)
 │   └── common.sh              # Shared setup: venv, HF cache, env vars
 ├── scripts/
-│   └── setup_env.sh.example   # Template for .env / environment variables
+│   ├── setup_env.sh.example   # Template for .env / environment variables
+│   └── middle_layer_alpha_sweep.py  # Causal layer-drift interpolation
+├── docs/
+│   └── causal_analysis.md     # Alpha-sweep reproduction instructions
 ├── experimental/              # Archived scripts from earlier research cycles
 └── requirements.txt
 ```
@@ -40,23 +45,24 @@ x-elm-v2/
 
 ## Installation
 
-### 1. Python + virtualenv
+### 1. Python + uv
 
 ```bash
-python -m venv .venv
+uv venv --python 3.12
 source .venv/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
-Python 3.10+ is recommended (3.11 tested). A recent CUDA toolkit (12.x) is required for GPU training.
+Install [`uv`](https://docs.astral.sh/uv/getting-started/installation/) first if
+it is not already available. Python 3.12+ is required by `pyproject.toml`. A
+recent CUDA toolkit (12.x) is required for GPU training.
 
 ### 2. flash-attention (optional but recommended)
 
-`flash-attn` is not installed by `requirements.txt` because it needs the Torch and CUDA toolchain to be present at build time. Install it after `pip install -r requirements.txt`:
+`flash-attn` is not installed by `requirements.txt` because it needs the Torch and CUDA toolchain to be present at build time. Install it after `uv pip install -r requirements.txt`:
 
 ```bash
-pip install flash-attn>=2.6.0 --no-build-isolation
+uv pip install 'flash-attn>=2.6.0' --no-build-isolation
 ```
 
 On clusters with custom builds, point at the prebuilt wheel instead.
@@ -80,20 +86,29 @@ The variables you'll typically set:
 | `CHECKPOINTS_ROOT`  | Checkpoint root                            | `$DATA_ROOT/checkpoints`         |
 | `HF_HOME`           | HuggingFace cache                          | `$DATA_ROOT/hf_cache`            |
 | `HF_TOKEN`          | Required for gated models (e.g. `gemma-3`) | —                                |
+| `MADLAD_LOCAL_JSONL` | Local MADLAD JSONL source for tokenization | —                                |
 
 `slurm/common.sh` auto-loads `.env` if present.
 
 ---
 
+## Working with coding agents
+
+There's an `AGENTS.md` file in the root directory of this repository to work with coding agents as well. You can update the file according to your liking and your choice of coding agent.
+
+
 ## Quick start
 
 ### Tokenize
 
-Download MADLAD-400 for the configured languages and save 95/5 train/valid Arrow splits per family:
+Set `MADLAD_LOCAL_JSONL` to the prepared local MADLAD source and save 95/5
+train/valid Arrow splits per family. The default token target is approximately
+833M tokens per language:
 
 ```bash
+export MADLAD_LOCAL_JSONL=/path/to/madlad.jsonl
 python tokenize_data.py \
-    --samples-per-family 10000 \
+    --token-target 833333333 \
     --output-path $TOKENIZED_DATA
 ```
 
@@ -129,7 +144,10 @@ python train.py --config_path configs/yaml/train_gemma_single_expert.yaml \
     --checkpoint.checkpoint_path $CHECKPOINTS_ROOT/slavic_gemma_4b_expert/final
 ```
 
-Downstream evaluation (Belebele, PIQA, FLORES) uses a patched `lm-eval-harness` — see the SLURM section below.
+Downstream evaluation (Belebele, PIQA, FLORES) uses the patched
+[`sanchit-ahuja/lm-evaluation-harness`](https://github.com/sanchit-ahuja/lm-evaluation-harness)
+fork. Install it in editable mode; the causal FLORES setup is documented in
+`docs/causal_analysis.md`.
 
 ### Revert middle-layer weights post-hoc
 
@@ -260,7 +278,8 @@ All seven systems (2 baselines + 5 alignment strategies) share the same setup: `
 
 1. **Tokenize** MADLAD-400 at 5B tokens/family:
    ```bash
-   python tokenize_data.py --samples-per-family 10000 --output-path $TOKENIZED_DATA
+   export MADLAD_LOCAL_JSONL=/path/to/madlad.jsonl
+   python tokenize_data.py --token-target 833333333 --output-path $TOKENIZED_DATA
    ```
 2. **Train the baselines**:
    - *Dense CPT* on all 32 training languages: `train_gemma_dense.yaml`, LR=`5e-5` , up to 50k steps.
@@ -291,6 +310,11 @@ All seven systems (2 baselines + 5 alignment strategies) share the same setup: `
    ```bash
    bash slurm/slurm_divergence_analysis.sh
    ```
+9. **(Optional) Reproduce the causal layer-drift interpolation study**:
+   ```bash
+   # Includes the required lm-eval FLORES post-processing notes.
+   less docs/causal_analysis.md
+   ```
 
 ---
 
@@ -310,17 +334,14 @@ Logs are otherwise emitted to stdout and captured by SLURM to `logs/`.
 
 If you use this codebase, please cite:
 
-<!-- add cite after arxiv -->
-
-
----
-
-## License
-
-_TBD — license will be decided at release time (likely MIT or Apache-2.0)._
-
----
-
-## Acknowledgements
-
-_TBD — compute and collaborator acknowledgements will be added before the camera-ready release._
+```bibtex
+@misc{ahuja2026parameteralignmentmitigatescatastrophic,
+      title={Parameter Alignment Mitigates Catastrophic Forgetting in Multilingual Expert Language Models},
+      author={Sanchit Ahuja and Terra Blevins},
+      year={2026},
+      eprint={2606.00284},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2606.00284},
+}
+```
