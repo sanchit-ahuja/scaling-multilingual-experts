@@ -1,6 +1,6 @@
 # Parameter Alignment Mitigates Catastrophic Forgetting in Multilingual Expert Language Models
 
-This repository implements the experiments in *Parameter Alignment Mitigates Catastrophic Forgetting in Multilingual Expert Language Models*.
+This repository implements the experiments in [*Parameter Alignment Mitigates Catastrophic Forgetting in Multilingual Expert Language Models*](https://arxiv.org/abs/2606.00284).
 
 ---
 
