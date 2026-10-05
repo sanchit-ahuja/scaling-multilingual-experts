@@ -10,7 +10,7 @@ from configs.base import (
     EvalConfig,
     RevertConfig,
 )
-from configs.constants import LANGS, LANGUAGE_FAMILIES
+from configs.constants import HELDOUT_LANGS, LANGS, LANGUAGE_FAMILIES
 
 __all__ = [
     "Config",
@@ -22,5 +22,6 @@ __all__ = [
     "EvalConfig",
     "RevertConfig",
     "LANGS",
+    "HELDOUT_LANGS",
     "LANGUAGE_FAMILIES",
 ]

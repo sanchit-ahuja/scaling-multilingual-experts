@@ -227,6 +227,10 @@ class L2SPRegularizer(Regularizer):
         self.exclude_patterns = exclude_patterns or []
         self.include_patterns = include_patterns or []
         self.base_weights: Dict[str, torch.Tensor] = {}
+        # Keep the persistent copy on CPU, but cache each tensor on the model
+        # device after its first use.  Moving weights inside penalty() on every
+        # microstep causes a repeated CPU -> GPU transfer.
+        self._device_base_weights: Dict[str, torch.Tensor] = {}
         self._registered = False
         self._matched_params: List[str] = []
     
@@ -252,6 +256,7 @@ class L2SPRegularizer(Regularizer):
     def register_base_model(self, model: torch.nn.Module) -> None:
         """Store base model weights on CPU for memory efficiency."""
         self.base_weights = {}
+        self._device_base_weights = {}
         self._matched_params = []
         
         unwrapped_model = model
@@ -297,7 +302,10 @@ class L2SPRegularizer(Regularizer):
         
         for name, param in unwrapped_model.named_parameters():
             if name in self.base_weights:
-                base_param = self.base_weights[name].to(device)
+                base_param = self._device_base_weights.get(name)
+                if base_param is None or base_param.device != device:
+                    base_param = self.base_weights[name].to(device=device)
+                    self._device_base_weights[name] = base_param
                 diff = (param - base_param).pow(2).sum()
                 if penalty is None:
                     penalty = diff
@@ -363,6 +371,9 @@ class LayerRangeL2SPRegularizer(Regularizer):
         self.include_patterns = include_patterns or []
         
         self.base_weights: Dict[str, torch.Tensor] = {}
+        # CPU is the durable copy; this cache avoids transferring the same
+        # tensor from CPU to GPU on every gradient-accumulation microstep.
+        self._device_base_weights: Dict[str, torch.Tensor] = {}
         self._registered = False
         
         # Track params by region for logging
@@ -425,6 +436,7 @@ class LayerRangeL2SPRegularizer(Regularizer):
     def register_base_model(self, model: torch.nn.Module) -> None:
         """Store base model weights on CPU for memory efficiency."""
         self.base_weights = {}
+        self._device_base_weights = {}
         self._first_layer_params = []
         self._middle_layer_params = []
         self._last_layer_params = []
@@ -438,6 +450,11 @@ class LayerRangeL2SPRegularizer(Regularizer):
         
         for name, param in unwrapped_model.named_parameters():
             if self._should_regularize(name):
+                # A zero coefficient contributes no gradient.  Do not retain
+                # or repeatedly compare against those base weights.
+                if self._get_layer_lambda(name) == 0.0:
+                    continue
+
                 if name in state_dict:
                     self.base_weights[name] = state_dict[name].detach().clone().cpu()
                 else:
@@ -507,8 +524,11 @@ class LayerRangeL2SPRegularizer(Regularizer):
         
         for name, param in unwrapped_model.named_parameters():
             if name in self.base_weights:
-                base_param = self.base_weights[name].to(device)
                 layer_lambda = self._get_layer_lambda(name)
+                base_param = self._device_base_weights.get(name)
+                if base_param is None or base_param.device != device:
+                    base_param = self.base_weights[name].to(device=device)
+                    self._device_base_weights[name] = base_param
                 diff = layer_lambda * (param - base_param).pow(2).sum()
                 
                 if penalty is None:

@@ -4,11 +4,13 @@
 #SBATCH --error=logs/perplexity_eval_%j.err
 #SBATCH --partition=ghx4
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:h100:1
+#SBATCH --gpus-per-node=1
+#SBATCH --ntasks-per-node=1
 #SBATCH --account=bfzp-dtai-gh
-#SBATCH --time=1:00:00
-#SBATCH --cpus-per-task=64
-#SBATCH --mem=100G
+#SBATCH --time=2:00:00
+#SBATCH --cpus-per-task=72
+#SBATCH --mem=110G
+#SBATCH --requeue
 
 # =============================================================================
 # Per-language Perplexity Evaluation Worker Script
@@ -23,12 +25,23 @@
 #       own cluster (partition, account, gres, time, etc.).
 # =============================================================================
 
-# Source common setup (cuda, venv, HF login, env vars)
-source "$(dirname "$0")/common.sh"
-hf_login
+set -euo pipefail
+
+# Slurm copies this script to a spool directory; use absolute paths rather
+# than resolving common.sh relative to $0. This evaluation uses local
+# checkpoints and the tokenized dataset, so the established ARM64 venv is
+# sufficient and avoids an unnecessary Hugging Face login.
+export PROJECT_ROOT="${PROJECT_ROOT:-/u/sahuja1/scaling-multilingual-experts}"
+source /u/sahuja1/x-elm-v2/.venv/bin/activate
+export DATA_ROOT="${DATA_ROOT:-/work/nvme/bfzp}"
+export TOKENIZED_DATA="${TOKENIZED_DATA:-${DATA_ROOT}/tokenized}"
+export HF_HOME="${HF_HOME:-${DATA_ROOT}/hf_cache}"
+mkdir -p "${PROJECT_ROOT}/logs"
+cd "${PROJECT_ROOT}"
 
 # Parse command line arguments
 CHECKPOINT_PATH=""
+FAMILY=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -37,7 +50,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --family)
-            # Accepted but ignored — perplexity always evaluates all families
+            FAMILY="$2"
             shift 2
             ;;
         --dataset)
@@ -85,7 +98,7 @@ python "${PROJECT_ROOT}/train.py" \
     --data.data_prefix ${DATA_PREFIX} \
     --checkpoint.serialization_dir ${OUTPUT_DIR} \
     --checkpoint.checkpoint_path ${CHECKPOINT_PATH} \
-    --data.families "[slavic,germanic,indic,romance,austronesian]" \
+    --data.families "[${FAMILY:-slavic,germanic,indic,romance,austronesian}]" \
     --model.model_name ${MODEL_NAME} \
     --training.valid_bsz 8 \
     --eval.eval_only true \

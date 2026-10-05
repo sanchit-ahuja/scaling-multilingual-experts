@@ -38,7 +38,7 @@ except Exception:
 import torch._dynamo
 torch._dynamo.config.suppress_errors = True
 
-from configs import Config, LANGS
+from configs import Config, HELDOUT_LANGS, LANGS
 from utils import load_model
 from regularization import (
     L2SPRegularizer,
@@ -475,8 +475,12 @@ def evaluate_checkpoint_per_language(
     results = []
     data_path = Path(data_prefix)
     
+    language_map = HELDOUT_LANGS if cfg.eval.heldout else LANGS
+    split_name = "held-out" if cfg.eval.heldout else "held-in"
+    print(f"Language split: {split_name}")
+
     for family in families:
-        family_langs = LANGS.get(family, [])
+        family_langs = language_map.get(family, [])
         
         for lang in family_langs:
             try:

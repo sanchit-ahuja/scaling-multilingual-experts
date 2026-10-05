@@ -11,6 +11,17 @@ LANGS: Dict[str, List[str]] = {
     "romance": ["es", "pt", "fr", "gl", "it", "ro"],
 }
 
+# Held-out evaluation languages. These are intentionally separate from LANGS:
+# they were not used for family CPT and should only be selected explicitly for
+# transfer evaluation.
+HELDOUT_LANGS: Dict[str, List[str]] = {
+    "slavic": ["bg", "cs", "lt", "pl", "sl", "lv"],
+    "germanic": ["de", "is", "no", "sv"],
+    "indic": ["as", "gu", "or", "pa", "sd", "si", "ur"],
+    "austronesian": ["ilo", "mi", "su", "war", "mg"],
+    "romance": ["ca"],
+}
+
 # Alias for convenience
 LANGUAGE_FAMILIES = list(LANGS.keys())
 

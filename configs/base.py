@@ -153,6 +153,10 @@ class EvalConfig:
     # Evaluate each language separately
     per_language_eval: bool = False
 
+    # Evaluate the explicit held-out language split instead of training
+    # languages. Requires the corresponding held-out tokenized dataset.
+    heldout: bool = False
+
 
 @dataclass
 class RevertConfig:
