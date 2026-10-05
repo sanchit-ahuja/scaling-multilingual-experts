@@ -28,7 +28,7 @@ checkpoints, or push artifacts to external services.
 - `model_soup.py`: post-hoc checkpoint averaging.
 - `configs/base.py` and `configs/yaml/`: configuration dataclasses and experiment
   presets.
-- `slurm/`: Delta-specific launch scripts. Shared defaults live in
+- `slurm/`: portable launch scripts. Shared defaults live in
   `slurm/common.sh`.
 - `scripts/`: sweep, plotting, and task-list helper scripts.
 - `docs/causal_analysis.md`: causal interpolation reproduction notes.
@@ -44,6 +44,15 @@ checkpoints, or push artifacts to external services.
   sync when editing language coverage.
 - Keep SLURM scripts portable through environment overrides. Do not hard-code
   personal paths, tokens, or new cluster-specific values in Python modules.
+- Before creating, modifying, or submitting a SLURM job, ask the user for the
+  target cluster/site, account or project, partition and QoS, GPU type and
+  count, CPU and memory requirements, walltime, storage paths, and environment
+  or module setup if those details have not already been provided. Do not
+  guess these values or submit a job before the user confirms them.
+- Keep site-specific settings outside the public repository where practical:
+  pass them through `sbatch` options, environment variables, or a local
+  untracked configuration file. Never commit credentials or private cluster
+  paths.
 - Do not read or print secret values from `.env`.
 - Do not launch tokenization, model downloads, training, evaluation sweeps,
   `sbatch`, Hugging Face uploads, or W&B runs unless the user explicitly asks.

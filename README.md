@@ -94,7 +94,12 @@ The variables you'll typically set:
 
 ## Working with coding agents
 
-There's an `AGENTS.md` file in the root directory of this repository to work with coding agents as well. You can update the file according to your liking and your choice of coding agent.
+The root [`AGENTS.md`](AGENTS.md) contains project guidance for coding agents.
+When a task involves SLURM, agents should first ask for the target cluster or
+site, account/project, partition and QoS, GPU type and count, CPU and memory
+requirements, walltime, storage paths, and environment setup unless these have
+already been supplied. Cluster-specific settings should be passed at submit
+time or kept in local untracked configuration rather than committed here.
 
 
 ## Quick start
