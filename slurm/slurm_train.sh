@@ -1,7 +1,5 @@
 #!/bin/bash
 #SBATCH --job-name=xelm-train
-#SBATCH --partition=p_csunivie_gres
-#SBATCH --account=datamining
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1

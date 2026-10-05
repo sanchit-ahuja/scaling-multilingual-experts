@@ -1,11 +1,11 @@
 #!/bin/bash
 # =============================================================================
-# Common setup for x-elm-v2 slurm scripts
+# Common setup for the repository's Slurm scripts
 # Source this file at the top of your slurm scripts:
 #   source slurm/common.sh
 #
 # Configuration (set these in your environment or in a .env file at PROJECT_ROOT):
-#   PROJECT_ROOT      - path to this repository  (default: $HOME/x-elm-v2)
+#   PROJECT_ROOT      - path to this repository  (default: repository root)
 #   DATA_ROOT         - root for tokenized data / checkpoints / hf cache
 #                       (default: $PROJECT_ROOT/data)
 #   TOKENIZED_DATA    - tokenized dataset root   (default: $DATA_ROOT/tokenized)
@@ -16,12 +16,15 @@
 # See scripts/setup_env.sh.example for a template.
 # =============================================================================
 
-# Load required modules (adjust for your cluster)
-module load cuda/12.6.1 2>/dev/null || true
+# Optionally load a site-specific CUDA module by setting CUDA_MODULE.
+if [[ -n "${CUDA_MODULE:-}" ]]; then
+    module load "${CUDA_MODULE}"
+fi
 
 # Activate virtual environment
-export PROJECT_ROOT="${PROJECT_ROOT:-$HOME/x-elm-v2}"
-source "${PROJECT_ROOT}/.venv/bin/activate"
+export PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+export VENV="${VENV:-${PROJECT_ROOT}/.venv}"
+source "${VENV}/bin/activate"
 
 # =============================================================================
 # Paths

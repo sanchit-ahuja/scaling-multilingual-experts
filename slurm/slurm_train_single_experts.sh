@@ -19,10 +19,8 @@
 #SBATCH --job-name=austronesian_gemma_4b_expert
 #SBATCH --output=logs/austronesian_gemma_4b_expert_%j.out
 #SBATCH --error=logs/austronesian_gemma_4b_expert_%j.err
-#SBATCH --partition=ghx4
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:h100:3
-#SBATCH --account=bfzp-dtai-gh
+#SBATCH --gres=gpu:3
 #SBATCH --time=48:00:00
 #SBATCH --cpus-per-task=64
 #SBATCH --mem=100G

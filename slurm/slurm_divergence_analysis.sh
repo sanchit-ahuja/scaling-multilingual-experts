@@ -18,10 +18,8 @@
 #SBATCH --job-name=divergence_analysis
 #SBATCH --output=logs/divergence_analysis_%j.out
 #SBATCH --error=logs/divergence_analysis_%j.err
-#SBATCH --partition=ghx4
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:h100:1
-#SBATCH --account=bfzp-dtai-gh
+#SBATCH --gres=gpu:1
 #SBATCH --time=2:00:00
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=80G

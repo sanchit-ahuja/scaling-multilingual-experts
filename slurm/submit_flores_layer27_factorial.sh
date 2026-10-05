@@ -5,7 +5,8 @@
 # screen samples so each result is scored against the registered baseline.
 set -euo pipefail
 
-REPO="/u/sahuja1/scaling-multilingual-experts"
+PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+REPO="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 cd "${REPO}"
 
 : "${BASELINE_EVAL_DIR:?Set BASELINE_EVAL_DIR to the existing 20-task Dense FLORES samples}"

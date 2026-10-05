@@ -2,10 +2,11 @@
 # Submit all-family exact Expert→Base [10,16) reversions and dependent held-in evaluations.
 set -euo pipefail
 
-REPO=/u/sahuja1/scaling-multilingual-experts
-CHECKPOINT_ROOT=/work/nvme/bfzp/checkpoints
-DATA_PREFIX=/work/nvme/bfzp/madlad-tokenized-5B
-RESULTS_ROOT=/work/hdd/bfzp/${USER}
+PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+REPO="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+CHECKPOINT_ROOT=${DATA_ROOT:-data}/checkpoints
+DATA_PREFIX=${DATA_ROOT:-data}/madlad-tokenized-5B
+RESULTS_ROOT=${RESULTS_ROOT:-results}/${USER}
 FAMILIES=(slavic germanic indic austronesian romance)
 
 checkpoint_path() {

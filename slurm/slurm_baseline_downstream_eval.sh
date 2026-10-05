@@ -2,10 +2,8 @@
 #SBATCH --job-name=baseline_lm_eval
 #SBATCH --output=logs/baseline_lm_eval_%j.out
 #SBATCH --error=logs/baseline_lm_eval_%j.err
-#SBATCH --partition=ghx4
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:h100:1
-#SBATCH --account=bfzp-dtai-gh
+#SBATCH --gres=gpu:1
 #SBATCH --time=10:00:00
 #SBATCH --cpus-per-task=64
 #SBATCH --mem=100G

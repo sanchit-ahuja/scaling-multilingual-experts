@@ -2,10 +2,8 @@
 #SBATCH --job-name=cross_family_lm_freezing_eval
 #SBATCH --output=cross_family_lm_freezing_eval_%j.out
 #SBATCH --error=cross_family_lm_freezing_eval_%j.err
-#SBATCH --partition=ghx4
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:h100:1
-#SBATCH --account=bfzp-dtai-gh
+#SBATCH --gres=gpu:1
 #SBATCH --time=8:00:00
 #SBATCH --cpus-per-task=64
 #SBATCH --mem=100G

@@ -2,8 +2,6 @@
 #SBATCH --job-name=flores-transfer-eval
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
-#SBATCH --partition=ghx4
-#SBATCH --account=bfzp-dtai-gh
 #SBATCH --nodes=1
 #SBATCH --gpus-per-node=1
 #SBATCH --ntasks-per-node=1
@@ -12,10 +10,11 @@
 #SBATCH --time=10:00:00
 #SBATCH --requeue
 set -euo pipefail
-REPO=/u/sahuja1/scaling-multilingual-experts
-source /u/sahuja1/x-elm-v2/.venv/bin/activate
-export HF_HOME=${HF_HOME:-/work/nvme/bfzp/hf_cache}
-export RESULTS_ROOT=${RESULTS_ROOT:-/work/hdd/bfzp/${USER}}
+PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+REPO="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+source "${VENV:-${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}/.venv}/bin/activate"
+export HF_HOME=${HF_HOME:-${DATA_ROOT:-data}/hf_cache}
+export RESULTS_ROOT=${RESULTS_ROOT:-${RESULTS_ROOT:-results}/${USER}}
 mkdir -p "${REPO}/logs"
 cd "${REPO}"
 : "${FAMILY:?Set FAMILY}" "${CHECKPOINT_PATH:?Set CHECKPOINT_PATH}" "${TAG:?Set TAG}"

@@ -2,10 +2,8 @@
 #SBATCH --job-name=soup_alpha_sweep
 #SBATCH --output=logs/soup_alpha_sweep_%j.out
 #SBATCH --error=logs/soup_alpha_sweep_%j.err
-#SBATCH --partition=ghx4
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:h100:1
-#SBATCH --account=bfzp-dtai-gh
+#SBATCH --gres=gpu:1
 #SBATCH --time=12:00:00
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=180G

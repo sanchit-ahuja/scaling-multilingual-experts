@@ -2,8 +2,6 @@
 #SBATCH --job-name=expert-revert-window
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
-#SBATCH --partition=ghx4
-#SBATCH --account=bfzp-dtai-gh
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-node=1
@@ -14,11 +12,12 @@
 # Materialize an exact Expert-to-Base reversion in a requested half-open range.
 set -euo pipefail
 
-REPO="/u/sahuja1/scaling-multilingual-experts"
-VENV="${VENV:-/u/sahuja1/x-elm-v2/.venv}"
+PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+REPO="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+VENV="${VENV:-${PROJECT_ROOT}/.venv}"
 FAMILY="${FAMILY:?Set FAMILY (e.g. Slavic)}"
 FAMILY_KEY="${FAMILY,,}"
-CHECKPOINT_ROOT="${CHECKPOINT_ROOT:-/work/nvme/bfzp/checkpoints}"
+CHECKPOINT_ROOT="${CHECKPOINT_ROOT:-${DATA_ROOT:-data}/checkpoints}"
 START="${START:-5}"
 END="${END:-11}"
 
@@ -35,7 +34,7 @@ mkdir -p logs
 export TOKENIZERS_PARALLELISM=false
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
-export HF_HOME="${HF_HOME:-/work/nvme/bfzp/hf_cache}"
+export HF_HOME="${HF_HOME:-${DATA_ROOT:-data}/hf_cache}"
 
 # These are the canonical saved Expert checkpoints. Indic is a numbered
 # checkpoint rather than a final export, so do not infer paths generically.

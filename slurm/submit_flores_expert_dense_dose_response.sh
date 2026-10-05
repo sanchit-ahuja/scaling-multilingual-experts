@@ -7,15 +7,16 @@
 # safeguards only for the new intermediate beta=.25/.75 hybrid checkpoints.
 set -euo pipefail
 
-REPO="/u/sahuja1/scaling-multilingual-experts"
-RESULTS_ROOT="${RESULTS_ROOT:-/work/hdd/bfzp/${USER}}"
-CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-/work/nvme/bfzp/checkpoints}"
+PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+REPO="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+RESULTS_ROOT="${RESULTS_ROOT:-${RESULTS_ROOT:-results}/${USER}}"
+CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-${DATA_ROOT:-data}/checkpoints}"
 DENSE_MODEL="${DENSE_MODEL:-${CHECKPOINTS_ROOT}/gemma_4b_dense_25b_v2/final}"
 INDIC_EXPERT_MODEL="${INDIC_EXPERT_MODEL:-${CHECKPOINTS_ROOT}/Indic_gemma_4b_expert/checkpoint-7000}"
 AUSTRO_EXPERT_MODEL="${AUSTRO_EXPERT_MODEL:-${CHECKPOINTS_ROOT}/austronesian_gemma_4b_expert/final}"
 BETAS="${BETAS:-0,0.25,0.5,0.75,1.0}"
 INTERMEDIATE_BETAS="${INTERMEDIATE_BETAS:-0.25,0.75}"
-DATA_PREFIX="${DATA_PREFIX:-/work/nvme/bfzp/madlad-tokenized-5B}"
+DATA_PREFIX="${DATA_PREFIX:-${DATA_ROOT:-data}/madlad-tokenized-5B}"
 
 tag_beta() {
   # Decimal beta spellings are valid path components and match the existing

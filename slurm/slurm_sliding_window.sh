@@ -2,25 +2,24 @@
 #SBATCH --job-name=sliding_window
 #SBATCH --output=logs/sliding_window_%j.out
 #SBATCH --error=logs/sliding_window_%j.err
-#SBATCH --partition=ghx4
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:h100:1
-#SBATCH --account=bfzp-dtai-gh
+#SBATCH --gres=gpu:1
 #SBATCH --time=24:00:00
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=160G
 
 set -euo pipefail
 
-# The runnable venv lives in x-elm-v2; this repo (scaling-multilingual-experts)
+# The runnable venv lives in the repository; this repo (scaling-multilingual-experts)
 # holds the scripts. Activate the venv explicitly, then run from this repo.
 # NOTE: $0 is the SLURM spool copy at runtime, so hardcode the repo path.
-REPO="/u/sahuja1/scaling-multilingual-experts"
-module load cuda/12.6.1 2>/dev/null || true
-source /u/sahuja1/x-elm-v2/.venv/bin/activate
-export DATA_ROOT="${DATA_ROOT:-/work/nvme/bfzp}"
-export CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-/work/nvme/bfzp/checkpoints}"
-export HF_HOME="${HF_HOME:-/work/nvme/bfzp/hf_cache}"
+PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+REPO="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+[[ -n "${CUDA_MODULE:-}" ]] && module load "${CUDA_MODULE}"
+source "${VENV:-${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}/.venv}/bin/activate"
+export DATA_ROOT="${DATA_ROOT:-${DATA_ROOT:-data}}"
+export CHECKPOINTS_ROOT="${CHECKPOINTS_ROOT:-${DATA_ROOT:-data}/checkpoints}"
+export HF_HOME="${HF_HOME:-${DATA_ROOT:-data}/hf_cache}"
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export TOKENIZERS_PARALLELISM=false
 cd "${REPO}"

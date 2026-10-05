@@ -2,11 +2,9 @@
 #SBATCH --job-name=perplexity_eval
 #SBATCH --output=logs/perplexity_eval_%j.out
 #SBATCH --error=logs/perplexity_eval_%j.err
-#SBATCH --partition=ghx4
 #SBATCH --nodes=1
 #SBATCH --gpus-per-node=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --account=bfzp-dtai-gh
 #SBATCH --time=2:00:00
 #SBATCH --cpus-per-task=72
 #SBATCH --mem=110G
@@ -31,9 +29,9 @@ set -euo pipefail
 # than resolving common.sh relative to $0. This evaluation uses local
 # checkpoints and the tokenized dataset, so the established ARM64 venv is
 # sufficient and avoids an unnecessary Hugging Face login.
-export PROJECT_ROOT="${PROJECT_ROOT:-/u/sahuja1/scaling-multilingual-experts}"
-source /u/sahuja1/x-elm-v2/.venv/bin/activate
-export DATA_ROOT="${DATA_ROOT:-/work/nvme/bfzp}"
+export PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+source "${VENV:-${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}/.venv}/bin/activate"
+export DATA_ROOT="${DATA_ROOT:-${DATA_ROOT:-data}}"
 export TOKENIZED_DATA="${TOKENIZED_DATA:-${DATA_ROOT}/tokenized}"
 export HF_HOME="${HF_HOME:-${DATA_ROOT}/hf_cache}"
 mkdir -p "${PROJECT_ROOT}/logs"

@@ -6,8 +6,8 @@
 #   bash slurm/submit_e3.sh global_piqa     # only piqa jobs
 #   SEEDS=1,2,3 bash slurm/submit_e3.sh     # override seeds
 set -euo pipefail
-cd /u/sahuja1/scaling-multilingual-experts
-source /u/sahuja1/x-elm-v2/.venv/bin/activate
+cd "${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+source "${VENV:-${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}/.venv}/bin/activate"
 FILTER="${1:-}"
 SEEDS="${SEEDS:-1,2,3,4,5}"
 

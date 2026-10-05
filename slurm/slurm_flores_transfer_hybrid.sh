@@ -2,8 +2,6 @@
 #SBATCH --job-name=flores-transfer-hybrid
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
-#SBATCH --partition=ghx4
-#SBATCH --account=bfzp-dtai-gh
 #SBATCH --nodes=1
 #SBATCH --gpus-per-node=1
 #SBATCH --ntasks-per-node=1
@@ -12,12 +10,13 @@
 #SBATCH --time=2:00:00
 #SBATCH --requeue
 set -euo pipefail
-REPO=/u/sahuja1/scaling-multilingual-experts
-source /u/sahuja1/x-elm-v2/.venv/bin/activate
-export DATA_ROOT=${DATA_ROOT:-/work/nvme/bfzp}
+PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+REPO="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+source "${VENV:-${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}/.venv}/bin/activate"
+export DATA_ROOT=${DATA_ROOT:-${DATA_ROOT:-data}}
 export CHECKPOINTS_ROOT=${CHECKPOINTS_ROOT:-${DATA_ROOT}/checkpoints}
 export HF_HOME=${HF_HOME:-${DATA_ROOT}/hf_cache}
-export RESULTS_ROOT=${RESULTS_ROOT:-/work/hdd/bfzp/${USER}}
+export RESULTS_ROOT=${RESULTS_ROOT:-${RESULTS_ROOT:-results}/${USER}}
 mkdir -p "${REPO}/logs"
 cd "${REPO}"
 : "${FAMILY:?Set FAMILY}" "${BETA:?Set BETA}" "${EXPERT_MODEL:?Set EXPERT_MODEL}" "${DONOR_MODEL:?Set DONOR_MODEL}"
