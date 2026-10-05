@@ -1,6 +1,6 @@
-# Parameter Alignment Mitigates Catastrophic Forgetting in Multilingual Expert Language Models
+# Specializing Without Forgetting: Analyzing Knowledge Preservation in Multilingual Model Adaptation
 
-This repository implements the experiments in [*Parameter Alignment Mitigates Catastrophic Forgetting in Multilingual Expert Language Models*](https://arxiv.org/abs/2606.00284).
+This repository implements the experiments in [*Specializing Without Forgetting: Analyzing Knowledge Preservation in Multilingual Model Adaptation*](https://arxiv.org/abs/2606.00284).
 
 ---
 
@@ -13,7 +13,7 @@ All experiments in the paper use [`google/gemma-3-4b-pt`](https://huggingface.co
 ## Repository layout
 
 ```
-x-elm-v2/
+scaling-multilingual-experts/
 ├── AGENTS.md                  # Shared coding-agent project guidance
 ├── CLAUDE.md                  # Claude Code adapter that imports AGENTS.md
 ├── train.py                   # Main training + evaluation entry point (pyrallis CLI)
@@ -30,7 +30,7 @@ x-elm-v2/
 │   ├── base.py                # pyrallis dataclasses (Config, ModelConfig, …)
 │   ├── constants.py           # LANGS, family / token-budget constants
 │   └── yaml/                  # Experiment YAMLs (base, train_gemma_*, revert_gemma_*)
-├── slurm/                     # SLURM job scripts (templated for NCSA Delta)
+├── slurm/                     # Portable SLURM job scripts
 │   └── common.sh              # Shared setup: venv, HF cache, env vars
 ├── scripts/
 │   ├── setup_env.sh.example   # Template for .env / environment variables
@@ -80,7 +80,7 @@ The variables you'll typically set:
 
 | Variable            | Purpose                                    | Default                          |
 | ------------------- | ------------------------------------------ | -------------------------------- |
-| `PROJECT_ROOT`      | Path to this repo                          | `$HOME/x-elm-v2`                 |
+| `PROJECT_ROOT`      | Path to this repo                          | Repository root                  |
 | `DATA_ROOT`         | Root for data + checkpoints + HF cache     | `$PROJECT_ROOT/data`             |
 | `TOKENIZED_DATA`    | Tokenized dataset root                     | `$DATA_ROOT/tokenized`           |
 | `CHECKPOINTS_ROOT`  | Checkpoint root                            | `$DATA_ROOT/checkpoints`         |
@@ -238,20 +238,20 @@ Training data is drawn from [MADLAD-400](https://huggingface.co/datasets/allenai
 
 ## SLURM usage
 
-All scripts in `slurm/` are **templated for the NCSA Delta cluster** (partition `ghx4`, account `bfzp-dtai-gh`, H100 GPUs). To use them on a different cluster, edit the `#SBATCH` directives at the top of each script — partition, account, gres, time, and memory — to match your environment.
+All scripts in `slurm/` are cluster-agnostic templates. Site-specific account and partition settings are intentionally omitted; provide them when submitting jobs, along with any GPU resource selection required by your cluster. Paths and environment settings can be overridden with variables such as `PROJECT_ROOT`, `VENV`, `DATA_ROOT`, `CHECKPOINTS_ROOT`, `RESULTS_ROOT`, and `CUDA_MODULE`.
 
 Common launch patterns:
 
 ```bash
 # Train one family specialist
-sbatch --export=FAMILY=Germanic,CONFIG_TYPE=single_expert \
+sbatch --partition=<partition> --account=<account> --export=FAMILY=Germanic,CONFIG_TYPE=single_expert \
        slurm/slurm_train_single_experts.sh
 
 # Tokenize data (CPU-only)
-sbatch slurm/slurm_tokenize_data.sh
+sbatch --partition=<partition> --account=<account> slurm/slurm_tokenize_data.sh
 
 # Per-language perplexity eval on one checkpoint
-sbatch slurm/slurm_perplexity_eval.sh \
+sbatch --partition=<partition> --account=<account> slurm/slurm_perplexity_eval.sh \
        --checkpoint_path $CHECKPOINTS_ROOT/germanic_gemma_4b_expert/final
 
 # Batch-submit downstream evals across all checkpoints
@@ -264,7 +264,7 @@ bash slurm/slurm_batch_downstream_eval.sh perplexity
 bash slurm/slurm_divergence_analysis.sh
 ```
 
-All scripts source `slurm/common.sh` for venv activation, HF-token login, and path defaults. Override paths by setting them before `sbatch`:
+Scripts that use the shared setup source `slurm/common.sh` for venv activation, HF-token login, and path defaults. Override paths by setting them before `sbatch`:
 
 ```bash
 DATA_ROOT=/my/fast/storage sbatch slurm/slurm_train_single_experts.sh
@@ -335,8 +335,8 @@ Logs are otherwise emitted to stdout and captured by SLURM to `logs/`.
 If you use this codebase, please cite:
 
 ```bibtex
-@misc{ahuja2026parameteralignmentmitigatescatastrophic,
-      title={Parameter Alignment Mitigates Catastrophic Forgetting in Multilingual Expert Language Models},
+@misc{ahuja2026specializingforgettinganalyzingknowledge,
+      title={Specializing Without Forgetting: Analyzing Knowledge Preservation in Multilingual Model Adaptation},
       author={Sanchit Ahuja and Terra Blevins},
       year={2026},
       eprint={2606.00284},
