@@ -290,7 +290,7 @@ All seven systems (2 baselines + 5 alignment strategies) share the same setup: `
    - *Family Expert* (one per family, five total): `train_gemma_single_expert.yaml` with `--data.families "[<Family>]"`, LR=`2e-5`, ~17k steps (~1 epoch).
 3. **Train the alignment strategies** per family:
    - *Layer Freezing*: `train_gemma_freeze.yaml`.
-   - *Layer-Range L2-SP*: `train_gemma_layer_range.yaml` with $\lambda_{\mathrm{first}}{=}\lambda_{\mathrm{last}}{=}0.001$, $\lambda_{\mathrm{mid}}{=}0.05$.
+   - *Layer-Range L2-SP*: `train_gemma_layer_range.yaml` with $\lambda_{\mathrm{mid}}{=}0.05$.
 4. **Apply post-hoc strategies**:
    - *Dense-Reverted* / *Expert-Reverted*: `revert_gemma_checkpoint.yaml` on each trained checkpoint.
    - *Expert Soup*: uniformly average the five non-reverted experts via `model_soup.py`.
