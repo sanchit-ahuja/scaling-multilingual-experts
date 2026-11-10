@@ -1,6 +1,5 @@
 # Specializing Without Forgetting: Analyzing Knowledge Preservation in Multilingual Model Adaptation
 
-This repository implements the experiments in [*Specializing Without Forgetting: Analyzing Knowledge Preservation in Multilingual Model Adaptation*](https://arxiv.org/abs/2606.00284).
 
 ---
 
@@ -334,19 +333,3 @@ export WANDB_MODE=disabled
 Logs are otherwise emitted to stdout and captured by SLURM to `logs/`.
 
 ---
-
-## Citation
-
-If you use this codebase, please cite:
-
-```bibtex
-@misc{ahuja2026specializingforgettinganalyzingknowledge,
-      title={Specializing Without Forgetting: Analyzing Knowledge Preservation in Multilingual Model Adaptation},
-      author={Sanchit Ahuja and Terra Blevins},
-      year={2026},
-      eprint={2606.00284},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2606.00284},
-}
-```
