@@ -287,7 +287,7 @@ All seven systems (2 baselines + 5 alignment strategies) share the same setup: `
    ```
 2. **Train the baselines**:
    - *Dense CPT* on all 32 training languages: `train_gemma_dense.yaml`, LR=`5e-5` , up to 50k steps.
-   - *Family Expert* (one per family, five total): `train_gemma_single_expert.yaml` with `--data.families "[<Family>]"`, LR=`2e-5`, ~17k steps (~1 epoch).
+   - *Family Expert* (one per family, five total): `train_gemma_single_expert.yaml` with `--data.families "[<Family>]"`, LR=`2e-5`,  (~0.35 epochs).
 3. **Train the alignment strategies** per family:
    - *Layer Freezing*: `train_gemma_freeze.yaml`.
    - *Layer-Range L2-SP*: `train_gemma_layer_range.yaml` with $\lambda_{\mathrm{mid}}{=}0.05$.
